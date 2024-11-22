@@ -11,7 +11,7 @@ app.use(express.static("public"));
 
 app.use("/api", schoolRoutes);
 
-const PORT = 8080;
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+const port = 8080;
+app.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
 });
