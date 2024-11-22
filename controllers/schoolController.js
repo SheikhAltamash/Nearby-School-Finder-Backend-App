@@ -1,8 +1,25 @@
 const schoolModel = require("../models/schoolModel");
 const calculateDistance = require("../services/distanceCalculator");
+const Joi = require("joi");
+// Joi Schemas
+const addSchoolSchema = Joi.object({
+  name: Joi.string().required(),
+  address: Joi.string().required(),
+  latitude: Joi.number().min(-90).max(90).required(),
+  longitude: Joi.number().min(-180).max(180).required(),
+});
+
+const listSchoolsSchema = Joi.object({
+  latitude: Joi.number().min(-90).max(90).required(),
+  longitude: Joi.number().min(-180).max(180).required(),
+});
 
 module.exports = {
   addSchool: async (req, res) => {
+     const { error } = addSchoolSchema.validate(req.body);
+     if (error) {
+       return res.status(400).json({ message: error.details[0].message });
+     }
     try {
       const { name, address, latitude, longitude } = req.body;
       if (!name || !address || !latitude || !longitude) {
@@ -16,11 +33,15 @@ module.exports = {
           schoolId: result.insertId,
         });
     } catch (err) {
-      res.status(500).json({ error: "Failed to add school" });
+      res.status(500).json({ error: "Failed to add school",mesage: err.message });
     }
   },
   listSchools: async (req, res) => {
     try {
+      const { error } = listSchoolsSchema.validate(req.query);
+      if (error) {
+        return res.status(400).json({ message: error.details[0].message });
+      }
       const { latitude, longitude } = req.query;
       if (!latitude || !longitude) {
         return res
